@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="format-detection" content="telephone=no,email=no,address=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>生日快乐</title>
+  <style>
+    :root {
+      --bg-top: #fff4d8;
+      --bg-mid: #ffd5bf;
+      --bg-bottom: #ff9c8f;
+      --ink: #5d2d31;
+      --ink-soft: rgba(93, 45, 49, 0.78);
+      --primary: #d84f62;
+      --primary-deep: #b43b50;
+      --soft: rgba(255, 255, 255, 0.72);
+      --soft-border: rgba(255, 255, 255, 0.42);
+      --gold: #ffd465;
+      --shadow: 0 18px 60px rgba(119, 49, 47, 0.18);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.9), transparent 26%),
+        radial-gradient(circle at 80% 18%, rgba(255, 240, 200, 0.75), transparent 24%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 48%, var(--bg-bottom) 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(10px);
+      opacity: 0.55;
+    }
+
+    body::before {
+      width: 52vw;
+      height: 52vw;
+      left: -12vw;
+      top: 10vh;
+      background: rgba(255, 255, 255, 0.65);
+    }
+
+    body::after {
+      width: 56vw;
+      height: 56vw;
+      right: -18vw;
+      bottom: 12vh;
+      background: rgba(255, 210, 192, 0.6);
+    }
+
+    .sparkles,
+    .confetti {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .sparkle,
+    .piece {
+      position: absolute;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .sparkle {
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.88);
+      clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+      animation-name: twinkle;
+    }
+
+    .piece {
+      top: -12vh;
+      width: 10px;
+      height: 22px;
+      border-radius: 999px;
+      opacity: 0.82;
+      animation-name: fall;
+    }
+
+    .page {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding:
+        calc(18px + var(--safe-top))
+        16px
+        calc(108px + var(--safe-bottom));
+    }
+
+    .hero-card,
+    .letter-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--soft-border);
+      border-radius: 28px;
+      background: var(--soft);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card::before,
+    .letter-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(140deg, rgba(255, 255, 255, 0.46), transparent 38%),
+        radial-gradient(circle at 86% 12%, rgba(255, 212, 101, 0.32), transparent 22%);
+      pointer-events: none;
+    }
+
+    .hero-card {
+      padding: 22px 18px 24px;
+    }
+
+    .topline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--ink-soft);
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .title {
+      margin: 16px 0 10px;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: clamp(34px, 10vw, 56px);
+      line-height: 1.08;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--ink-soft);
+    }
+
+    .cake-wrap {
+      position: relative;
+      margin-top: 18px;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .halo {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 201, 0.64) 40%, transparent 74%);
+      filter: blur(5px);
+      animation: pulse 2.8s ease-in-out infinite;
+    }
+
+    .cake {
+      position: relative;
+      width: 220px;
+      height: 230px;
+    }
+
+    .plate {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      width: 240px;
+      height: 22px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8), 0 10px 18px rgba(106, 48, 46, 0.12);
+    }
+
+    .layer,
+    .icing {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 26px;
+    }
+
+    .layer.top {
+      bottom: 108px;
+      width: 112px;
+      height: 60px;
+      background: linear-gradient(180deg, #ffe9b0, #ffc67f);
+    }
+
+    .layer.middle {
+      bottom: 62px;
+      width: 160px;
+      height: 72px;
+      background: linear-gradient(180deg, #ffdbb4, #ffad8b);
+    }
+
+    .layer.bottom {
+      bottom: 22px;
+      width: 204px;
+      height: 78px;
+      background: linear-gradient(180deg, #ffd0cb, #ff8c86);
+    }
+
+    .icing.one {
+      bottom: 154px;
+      width: 120px;
+      height: 16px;
+      background: #fff9f0;
+    }
+
+    .icing.two {
+      bottom: 108px;
+      width: 168px;
+      height: 16px;
+      background: #fff9f0;
+    }
+
+    .icing.three {
+      bottom: 70px;
+      width: 210px;
+      height: 18px;
+      background: #fff9f0;
+    }
+
+    .candle {
+      position: absolute;
+      left: 50%;
+      bottom: 166px;
+      width: 14px;
+      height: 56px;
+      transform: translateX(-50%);
+      border-radius: 10px;
+      background: repeating-linear-gradient(45deg, #ffffff 0, #ffffff 7px, #ff818a 7px, #ff818a 14px);
+    }
+
+    .flame {
+      position: absolute;
+      left: 50%;
+      bottom: 216px;
+      width: 24px;
+      height: 36px;
+      transform: translateX(-50%);
+      transform-origin: center bottom;
+      border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+      background: radial-gradient(circle at 50% 30%, #fff7d9 0%, #ffd56d 40%, #ff9a4d 76%, rgba(255, 154, 77, 0) 78%);
+      filter: drop-shadow(0 0 12px rgba(255, 207, 90, 0.88));
+      animation: flicker 1.2s ease-in-out infinite;
+    }
+
+    .wish-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .wish {
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--ink-soft);
+      background: rgba(216, 79, 98, 0.11);
+    }
+
+    .letter-card {
+      margin-top: 16px;
+      padding: 20px 18px 22px;
+      transform: translateY(24px);
+      opacity: 0;
+      transition: transform 520ms ease, opacity 520ms ease;
+    }
+
+    .letter-card.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .letter-title {
+      margin: 0 0 12px;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 28px;
+    }
+
+    .letter-body p {
+      margin: 0 0 12px;
+      font-size: 16px;
+      line-height: 1.9;
+      color: var(--ink-soft);
+    }
+
+    .signature {
+      margin-top: 14px;
+      font-family: "STKaiti", "KaiTi", serif;
+      font-size: 22px;
+      color: var(--primary);
+    }
+
+    .tip {
+      margin-top: 16px;
+      font-size: 12px;
+      color: rgba(93, 45, 49, 0.55);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 5;
+      width: 100%;
+      max-width: 520px;
+      transform: translateX(-50%);
+      padding: 10px 16px calc(12px + var(--safe-bottom));
+      background: linear-gradient(180deg, rgba(255, 244, 216, 0), rgba(255, 244, 216, 0.9) 24%, rgba(255, 244, 216, 0.98) 100%);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      min-height: 48px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, opacity 180ms ease;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .primary-btn {
+      color: #fffaf4;
+      background: linear-gradient(135deg, var(--primary), var(--primary-deep));
+      box-shadow: 0 12px 24px rgba(180, 59, 80, 0.28);
+    }
+
+    .ghost-btn {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 8px 20px rgba(92, 43, 45, 0.08);
+    }
+
+    .share-note {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(93, 45, 49, 0.6);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { transform: scale(0.6); opacity: 0.35; }
+      50% { transform: scale(1.18); opacity: 1; }
+    }
+
+    @keyframes fall {
+      0% { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+      100% { transform: translate3d(var(--drift), 110vh, 0) rotate(540deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.98); opacity: 0.74; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+
+    @keyframes flicker {
+      0%, 100% { transform: translateX(-50%) rotate(-2deg) scaleY(1); }
+      50% { transform: translateX(-50%) rotate(3deg) scaleY(1.08); }
+    }
+
+    @media (max-width: 360px) {
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .page {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .bottom-bar {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+    }
+
+    @media (min-width: 521px) {
+      body {
+        display: flex;
+        justify-content: center;
+      }
+
+      .page {
+        padding-top: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sparkles" id="sparkles" aria-hidden="true"></div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <main class="page">
+    <section class="hero-card">
+      <div class="topline">HAPPY BIRTHDAY · <span id="friendInline">小太阳</span></div>
+      <h1 class="title" id="headline">愿这一岁，依旧闪闪发光。</h1>
+      <p class="subtitle" id="subtitle">
+        有些人出现，就会让平凡的日子也变得柔软、明亮、值得期待。今天轮到全世界一起祝你生日快乐。
+      </p>
+
+      <div class="cake-wrap">
+        <div class="halo"></div>
+        <div class="cake" aria-label="birthday cake">
+          <div class="flame" id="flame"></div>
+          <div class="candle"></div>
+          <div class="icing one"></div>
+          <div class="icing two"></div>
+          <div class="icing three"></div>
+          <div class="layer top"></div>
+          <div class="layer middle"></div>
+          <div class="layer bottom"></div>
+          <div class="plate"></div>
+        </div>
+      </div>
+
+      <div class="wish-strip" id="wishStrip"></div>
+    </section>
+
+    <section class="letter-card" id="letterCard">
+      <h2 class="letter-title" id="letterTitle">给最特别的你</h2>
+      <div class="letter-body" id="letterBody"></div>
+      <div class="signature" id="signature"></div>
+      <div class="tip">想改名字和祝福语，直接修改页面底部脚本里的 CONFIG 即可。</div>
+    </section>
+  </main>
+
+  <div class="bottom-bar">
+    <div class="actions">
+      <button class="primary-btn" id="openLetter">拆开生日信</button>
+      <button class="ghost-btn" id="blowCandle">吹蜡烛</button>
+      <button class="ghost-btn" id="toggleMusic">播放生日歌</button>
+    </div>
+    <div class="share-note">微信里通常需要手动点一下，音乐才能开始播放</div>
+  </div>
+
+  <script>
+    const CONFIG = {
+      friendName: "小太阳",
+      headline: "愿这一岁，依旧闪闪发光。",
+      subtitle: "有些人出现，就会让平凡的日子也变得柔软、明亮、值得期待。今天轮到全世界一起祝你生日快乐。",
+      letterTitle: "给最特别的你",
+      letterLines: [
+        "生日快乐呀。愿你在新的一岁里，继续被爱包围，也继续勇敢地爱这个世界。",
+        "希望你的每一个小愿望都有人认真听见，每一次努力都能换来值得骄傲的回响。",
+        "如果生活偶尔有点累，那也别忘了你一直都很棒。慢一点没关系，开心一点最重要。",
+        "愿你遇见更多温柔的人、更多明亮的事，也始终保留现在这份真诚和可爱。"
+      ],
+      signature: "一直为你庆祝的人",
+      wishes: ["万事顺意", "平安喜乐", "心想事成", "天天开心"]
+    };
+
+    const sparkles = document.getElementById("sparkles");
+    const confetti = document.getElementById("confetti");
+    const letterCard = document.getElementById("letterCard");
+    const flame = document.getElementById("flame");
+    const musicButton = document.getElementById("toggleMusic");
+
+    let audioContext;
+    let musicPlaying = false;
+    let stopMusicTimer = null;
+
+    const BGM = [
+      ["G4", 0.45], ["G4", 0.2], ["A4", 0.7], ["G4", 0.7], ["C5", 0.7], ["B4", 1.2],
+      ["G4", 0.45], ["G4", 0.2], ["A4", 0.7], ["G4", 0.7], ["D5", 0.7], ["C5", 1.2],
+      ["G4", 0.45], ["G4", 0.2], ["G5", 0.7], ["E5", 0.7], ["C5", 0.7], ["B4", 0.7], ["A4", 1.2],
+      ["F5", 0.45], ["F5", 0.2], ["E5", 0.7], ["C5", 0.7], ["D5", 0.7], ["C5", 1.35]
+    ];
+
+    const NOTE_FREQ = {
+      C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.0, A4: 440.0, B4: 493.88,
+      C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99
+    };
+
+    function applyContent() {
+      document.getElementById("friendInline").textContent = CONFIG.friendName;
+      document.getElementById("headline").textContent = CONFIG.headline;
+      document.getElementById("subtitle").textContent = CONFIG.subtitle;
+      document.getElementById("letterTitle").textContent = CONFIG.letterTitle;
+      document.getElementById("signature").textContent = CONFIG.signature;
+      document.title = CONFIG.friendName + "，生日快乐";
+
+      const body = document.getElementById("letterBody");
+      body.innerHTML = "";
+      CONFIG.letterLines.forEach((line) => {
+        const p = document.createElement("p");
+        p.textContent = line;
+        body.appendChild(p);
+      });
+
+      const wishStrip = document.getElementById("wishStrip");
+      wishStrip.innerHTML = "";
+      CONFIG.wishes.forEach((wish) => {
+        const span = document.createElement("span");
+        span.className = "wish";
+        span.textContent = wish;
+        wishStrip.appendChild(span);
+      });
+    }
+
+    function createSparkles() {
+      for (let i = 0; i < 18; i += 1) {
+        const item = document.createElement("span");
+        item.className = "sparkle";
+        item.style.left = Math.random() * 100 + "vw";
+        item.style.top = Math.random() * 100 + "vh";
+        item.style.animationDuration = 2 + Math.random() * 3 + "s";
+        item.style.animationDelay = Math.random() * 3 + "s";
+        sparkles.appendChild(item);
+      }
+    }
+
+    function launchConfetti(amount = 30) {
+      const colors = ["#ff6b6b", "#ffd166", "#7bd389", "#5bb9ff", "#ff9f68", "#f38bc6"];
+      for (let i = 0; i < amount; i += 1) {
+        const piece = document.createElement("span");
+        piece.className = "piece";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = 4 + Math.random() * 2.8 + "s";
+        piece.style.animationDelay = Math.random() * 0.4 + "s";
+        piece.style.setProperty("--drift", (Math.random() * 160 - 80) + "px");
+        confetti.appendChild(piece);
+        setTimeout(() => piece.remove(), 7200);
+      }
+    }
+
+    function revealLetter() {
+      letterCard.classList.add("visible");
+      launchConfetti(38);
+      letterCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function blowCandle() {
+      flame.style.transition = "opacity 260ms ease, transform 260ms ease";
+      flame.style.opacity = "0";
+      flame.style.transform = "translateX(-50%) scale(0.35)";
+      setTimeout(() => {
+        flame.style.opacity = "1";
+        flame.style.transform = "translateX(-50%) scale(1)";
+      }, 1100);
+      launchConfetti(16);
+    }
+
+    function ensureAudioContext() {
+      if (!audioContext) {
+        const Context = window.AudioContext || window.webkitAudioContext;
+        if (!Context) return null;
+        audioContext = new Context();
+      }
+      return audioContext;
+    }
+
+    function stopMusic() {
+      if (stopMusicTimer) {
+        clearTimeout(stopMusicTimer);
+        stopMusicTimer = null;
+      }
+      musicPlaying = false;
+      musicButton.textContent = "播放生日歌";
+    }
+
+    async function playBirthdaySong() {
+      const ctx = ensureAudioContext();
+      if (!ctx) {
+        musicButton.textContent = "当前浏览器不支持";
+        return;
+      }
+
+      if (ctx.state === "suspended") {
+        await ctx.resume();
+      }
+
+      if (musicPlaying) {
+        stopMusic();
+        return;
+      }
+
+      musicPlaying = true;
+      musicButton.textContent = "停止生日歌";
+
+      const startTime = ctx.currentTime + 0.03;
+      let cursor = startTime;
+
+      BGM.forEach(([note, duration], index) => {
+        const freq = NOTE_FREQ[note];
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        oscillator.type = index % 2 === 0 ? "sine" : "triangle";
+        oscillator.frequency.setValueAtTime(freq, cursor);
+
+        gainNode.gain.setValueAtTime(0.0001, cursor);
+        gainNode.gain.exponentialRampToValueAtTime(0.11, cursor + 0.03);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, cursor + duration * 0.92);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscillator.start(cursor);
+        oscillator.stop(cursor + duration);
+        cursor += duration;
+      });
+
+      stopMusicTimer = setTimeout(stopMusic, (cursor - startTime) * 1000 + 120);
+    }
+
+    applyContent();
+    createSparkles();
+    launchConfetti(22);
+
+    document.getElementById("openLetter").addEventListener("click", revealLetter);
+    document.getElementById("blowCandle").addEventListener("click", blowCandle);
+    musicButton.addEventListener("click", playBirthdaySong);
+
+    setTimeout(revealLetter, 900);
+  </script>
+</body>
+</html>
